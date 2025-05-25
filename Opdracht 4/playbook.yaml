@@ -1,0 +1,44 @@
+---
+- name : Install and update packages
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: update packages
+      ansible.builtin.apt:
+        name: "*"
+        state: latest
+
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: install apache2
+      ansible.builtin.apt:
+        name: apache2
+        state: present  
+
+    - name: Start Apache service
+      service:
+        name: apache2
+        state: started
+
+- name: install and update packages
+  hosts: databaseserver
+  become: yes
+  tasks:
+    - name: update packages
+      ansible.builtin.apt:
+        name: "*"
+        state: latest
+
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: install mariaDB
+      ansible.builtin.apt:
+        name: mariadb-server
+        update_cache: yes
+        state: latest
+
+
