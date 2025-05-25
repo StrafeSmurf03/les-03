@@ -1,0 +1,50 @@
+---
+- name: Backup alle VM's op Proxmox hypervisor
+  hosts: proxmox
+  gather_facts: false
+  vars:
+    proxmox_api_host: node1
+    proxmox_api_user: test
+    proxmox_api_password: test
+    backup_storage: backup_vm
+    
+  tasks:
+    - name: Haal lijst van alle VM's op
+      community.general.proxmox_vm_info:
+        api_host: "{{ proxmox_api_host }}"
+        api_user: "{{ proxmox_api_user }}"
+        api_password: "{{ proxmox_api_password }}"
+        validate_certs: false
+      register: vm_list
+
+    - name: Maak backup van elke VM
+      community.general.proxmox:
+        api_host: "{{ proxmox_api_host }}"
+        api_user: "{{ proxmox_api_user }}"
+        api_password: "{{ proxmox_api_password }}"
+        validate_certs: false
+        vmid: "{{ item.vmid }}"
+        state: backup
+        storage: "{{ backup_storage }}"
+        compress: gzip
+        mode: snapshot
+        remove: false
+      loop: "{{ vm_list.proxmox_vms }}"
+      when: 
+        - vm_list.proxmox_vms is defined
+        - item.status == "running" or item.status == "stopped"
+      register: backup_results
+      async: 3600  
+      poll: 30     
+
+    - name: Wacht tot alle backups zijn voltooid
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: backup_jobs
+      until: backup_jobs.finished
+      retries: 120  
+      delay: 30
+      loop: "{{ backup_results.results }}"
+      when: 
+        - backup_results is defined
+        - item.ansible_job_id is defined
