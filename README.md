@@ -3,11 +3,11 @@
 ## Inhoud
 Deze repository bevat de volgende opdrachten:
 
-Opdracht 3: Beschrijving van wat deze opdracht inhoudt.
+Opdracht 3: 
 
-Opdracht 4: Beschrijving van wat deze opdracht inhoudt.
+Opdracht 4: 
 
-Opdracht 5: Beschrijving van wat deze opdracht inhoudt.
+Opdracht 5: 
 
 ## Hoe te gebruiken
 Clone de repository:
